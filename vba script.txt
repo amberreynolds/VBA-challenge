@@ -1,0 +1,77 @@
+Sub TotalStockVolume():
+
+'loop through worksheets
+ For Each ws In Worksheets
+
+'variables
+ Dim i, j As Long
+ Dim total As Double
+ Dim ticker As String
+ Dim lastrow As Long
+ Dim ychange As Double
+ Dim pchange As Double
+ Dim oprice As Double
+ Dim cprice As Double
+ Dim oprice_row As Long
+
+ 'header
+ ws.Range("I1").Value = "Ticker"
+ ws.Range("J1").Value = "Yearly Change"
+ ws.Range("K1").Value = "Percent Change"
+ ws.Range("L1").Value = "Total Stock Value"
+
+ total = 0
+ j = 2
+ oprice_row = 2
+
+ 'find last row
+ lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+ 'loop through each year/worksheet
+ For i = 2 To lastrow
+     
+    
+     If ws.Range("A" & i + 1).Value = ws.Range("A" & i).Value Then
+
+         'Calculate Total Volume for Each Ticker If Tickers are same
+         total = total + ws.Range("G" & i).Value
+
+     Else
+         'ticker
+         ticker = ws.Range("A" & i).Value
+
+         'yearly change and percent change
+         oprice = ws.Range("C" & oprice_row)
+         cprice = ws.Range("F" & i)
+         ychange = cprice - oprice
+
+         '% change
+         If oprice = 0 Then
+            pchange = 0
+         Else
+            pchange = ychange / oprice
+         End If
+
+         'insert data in display cells
+         ws.Range("I" & j).Value = ticker
+         ws.Range("L" & j).Value = total + ws.Range("G" & i).Value
+         ws.Range("J" & j).Value = ychange
+         ws.Range("K" & j).Value = pchange
+         ws.Range("K" & j).NumberFormat = "0.00%"
+         
+         
+         'conditional formatting with green(positive)/red(negative)
+         If ws.Range("J" & j).Value > 0 Then
+            ws.Range("J" & j).Interior.ColorIndex = 4
+         Else
+            ws.Range("J" & j).Interior.ColorIndex = 3
+         End If
+
+         j = j + 1
+         total = 0
+         oprice_row = i + 1
+         
+     End If
+ Next i
+ Next ws
+End Sub
